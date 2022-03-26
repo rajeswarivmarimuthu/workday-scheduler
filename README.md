@@ -1,5 +1,3 @@
-# workday-scheduler
-
 
 # Workday Calendar
 
