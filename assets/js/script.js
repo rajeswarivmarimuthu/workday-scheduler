@@ -1,72 +1,113 @@
 
-
+// Global Variables declared here!!
 var todayEl = document.getElementById("currentDay")
 var plannerTab = document.getElementById('myTable');
 var today = moment().format('dddd, MMMM Do');
 var currentTimeHH = moment().format('H')
 var currentTime = moment().format('h');
 var startTime = 9;  // must be in 24 hours format!!
+var workingHours = 10; // 
 todayEl.innerText = today;
 
 
 // Build Time blocks and fetching value from localstorage
-for (i=0;i<8;i++){
+for (i=0;i<workingHours;i++){
     addTimeBlocks(i, startTime);
 }
 retrieveEventDetails();
 
+// Save event details to localstorage when the values button is clicked
+plannerTab.addEventListener ('click', function(e){
+    e.preventDefault;
+    console.log(e);
+    var arrEvent = []; 
+    let eventDesc;
+    var tdElement;
+
+    if (e.target.id == 'iconSave') {
+        var iconParent = e.target.parentElement;
+        tdElement = iconParent.parentElement;
+    } else if (e.target.id == 'button') {
+        tdElement = e.target.parentElement;
+    }
+
+    if (tdElement){
+        var trElement = tdElement.parentElement;
+        var rowID = trElement.id;
+        var cellValue = trElement.children[1].innerText;
+        console.log(cellValue);
+            if (cellValue) {
+                var localStorageString = JSON.parse(localStorage.getItem("eventDesc"));
+                if (localStorageString) {
+                    arrEvent = localStorageString;
+                }
+                eventDesc = {
+                    "row" : rowID,
+                    "eventValue" : cellValue
+                }
+                arrEvent.push(eventDesc); 
+                localStorage.setItem("eventDesc", JSON.stringify(arrEvent));
+            }
+    }
+
+    return;
+});
+
+
 ///function to add time blocks
 function  addTimeBlocks(rowCnt,startTime) {
-
-    var tr = plannerTab.insertRow(rowCnt); // table row.
-    tr = plannerTab.insertRow(rowCnt);
-    trID = 'tr' + rowCnt; 
-    tr.setAttribute("id", trID); 
+    //define some attributes for table, table row and cells 
 
     const timeAttributes = {
         type: 'text',
-        width: '10%',
-        class: 'border-right border-bottom p-1 hour'
+        width: '7%',
+        class: 'border-right border-bottom p-1 hour text-right'
     }
    
     const pastDescAtrributes = {
-        type: 'label',
-        width: '75%',
-        class: 'border-right border-bottom p-1 table-secondary ',
+        width: '88%',
+        class: 'border-right border-bottom p-1 table-secondary description  text-left',
         id: 'event',
         contenteditable: 'false'
     }
 
     const presentDescAtrributes = {
-        type: 'label',
-        width: '75%',
-        class: 'border-right border-bottom p-1 table-danger',
+        width: '88%',
+        class: 'border-right border-bottom p-1 table-danger description text-left',
         id: 'event',
         contenteditable: "true"
     }
 
     const futureDescAtrributes = {
-        type: 'label',
-        width: '75%',
-        class: 'border-right border-bottom p-1 table-success',
+        width: '88%',
+        class: 'border-right border-bottom p-1 table-success description text-left',
         id: 'event',
         contenteditable: "true"
     }
 
     const actionAttributes = {
-        type: "label",
         width: "5%",
-        class: "border-bottom border-right p-1"
+        class: "p-1 border-bottom-0"
     }     
     
     const buttonAttributes = {
         type: 'button',
         class: 'saveBtn p-1',
         id: 'button',
-        value: 'Save',
-        width: '100%'
     }
 
+    const iconAttributes = {
+        class: 'fas fa-save',
+        id: 'iconSave'
+    }
+
+    // Inserting rows based on number of working hours
+    var tr = plannerTab.insertRow(rowCnt);  
+    tr = plannerTab.insertRow(rowCnt);
+    trID = 'tr' + rowCnt; 
+    tr.setAttribute("id", trID); 
+
+    // formatting the time to be displayed in the table for the current day 
     displayTime = startTime + rowCnt; 
     if (displayTime >= 24) {
        return;
@@ -82,10 +123,11 @@ function  addTimeBlocks(rowCnt,startTime) {
         displayHour = displayTime + " PM";
     } else { 
         console.log ('invalid display time')
+        return;
     };
     
-   
 
+    // Inserting the cells to the table and applying the aattributes as mandated
     for (var c = 0; c < 3; c++) {
         var td = document.createElement('td');         
         td = tr.insertCell(c);
@@ -96,7 +138,6 @@ function  addTimeBlocks(rowCnt,startTime) {
                 td.innerText = displayHour;
                 break;
             case 1 :
-                console.log (currentTimeHH, displayTime);
                 if (currentTimeHH > displayTime) {
                     setAttributes(td, pastDescAtrributes);
                 } else if (currentTimeHH < displayTime) {
@@ -107,47 +148,25 @@ function  addTimeBlocks(rowCnt,startTime) {
                 break;
             case 2 :
                 setAttributes(td, actionAttributes)
-                var button = document.createElement('input');
+                var button = document.createElement('button');
+                var buttonIcon = document.createElement("i");
+                setAttributes(buttonIcon,iconAttributes);
                 setAttributes(button,buttonAttributes);
                 td.appendChild(button);
+                button.appendChild(buttonIcon);
                 break;
         }
     }
     return;
-    function setAttributes(element, attributes) {
-        Object.keys(attributes).forEach(attr => {
-          element.setAttribute(attr, attributes[attr]);
-        });
-      }
 }
 
-// Save event details to localstorage when the values button is clicked
-plannerTab.addEventListener ('click', function(e){
-    e.preventDefault;
-    console.log(e.target.id);
-    if (e.target.id == 'button') {
-        var tdElement = e.target.parentElement;
-        var trElement = tdElement.parentElement;
-        var rowID = trElement.id;
-        var arrEvent = []; 
-        let eventDesc;
-        var cellValue = trElement.children[1].innerText;
-        console.log(cellValue);
-        if (cellValue) {
-            var localStorageString = JSON.parse(localStorage.getItem("eventDesc"));
-            if (localStorageString) {
-                arrEvent = localStorageString;
-            }
-            eventDesc = {
-                "row" : rowID,
-                "eventValue" : cellValue
-            }
-            arrEvent.push(eventDesc); 
-            localStorage.setItem("eventDesc", JSON.stringify(arrEvent));
-        }
-    }
 
-});
+//function to apply the styling attributes 
+function setAttributes(element, attributes) {
+    Object.keys(attributes).forEach(attr => {
+      element.setAttribute(attr, attributes[attr]);
+    });
+  }
 
 //Logic to retrieve event details from local storage
 function retrieveEventDetails () {
