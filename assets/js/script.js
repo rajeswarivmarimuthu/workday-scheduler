@@ -60,26 +60,26 @@ function  addTimeBlocks(rowCnt,startTime) {
 
     const timeAttributes = {
         type: 'text',
-        width: '7%',
+        width: '10%',
         class: 'border-right border-bottom p-1 hour text-right'
     }
    
     const pastDescAtrributes = {
-        width: '88%',
+        width: '85%',
         class: 'border-right border-bottom p-1 table-secondary description  text-left',
         id: 'event',
         contenteditable: 'false'
     }
 
     const presentDescAtrributes = {
-        width: '88%',
+        width: '85%',
         class: 'border-right border-bottom p-1 table-danger description text-left',
         id: 'event',
         contenteditable: "true"
     }
 
     const futureDescAtrributes = {
-        width: '88%',
+        width: '85%',
         class: 'border-right border-bottom p-1 table-success description text-left',
         id: 'event',
         contenteditable: "true"
